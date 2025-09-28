@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Platform Product Scraper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #000;
+            color: white;
+            padding: 20px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-item {
+            color: #6c757d;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .copyright {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .main-title {
+            text-align: center;
+            padding: 60px 20px 40px;
+            background: white;
+        }
+
+        .main-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .main-title p {
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+
+        .main-content {
+            padding: 0 20px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #212529;
+            font-size: 1.1rem;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            resize: vertical;
+            min-height: 120px;
+            background: white;
+            font-family: inherit;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .url-input.error {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            border-color: #545b62;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            color: #495057;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .results-table td {
+            padding: 16px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: top;
+        }
+
+        .results-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .product-title {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-width: 300px;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stars {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+
+        .rating-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status.verified {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status.unverified {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+            border: 1px solid #bee5eb;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 40px;
+            color: #6c757d;
+            font-size: 1.1rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 1200px) {
+            .results-table {
+                font-size: 0.85rem;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 8px 6px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .main-title h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 0 15px 30px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .results-table {
+                font-size: 0.8rem;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 12px 8px;
+                min-width: 120px;
+            }
+
+            .product-description {
+                max-width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .results-table {
+                font-size: 0.75rem;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 6px 4px;
+                min-width: 100px;
+            }
+
+            .product-description {
+                max-width: 150px;
+            }
+            
+            .product-image {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <a href="#" class="logo">SCRAPER</a>
+                <div class="copyright">(c)Saya 2025</div>
+            </div>
+        </div>
+        
+        <div class="main-title">
+            <h1>🛍️ Мультиплатформенный Скрапер Товаров</h1>
+            <p>Простые в использовании онлайн инструменты для извлечения информации о товарах</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="urlInput">📎 Вставьте ссылки на товары с поддерживаемых платформ (по одной на строку):</label>
+                    <textarea 
+                        id="urlInput" 
+                        class="url-input" 
+                        placeholder="https://detail.1688.com/offer/1234567890.html&#10;https://www.amazon.com/dp/B08N5WRWNW&#10;https://www.aliexpress.ru/item/1234567890.html&#10;https://www.pinduoduo.com/goods_detail.html?goods_id=1234567890&#10;https://www.alibaba.com/product-detail/1234567890.html&#10;https://item.taobao.com/item.htm?id=1234567890"
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button id="startBtn" class="btn btn-primary">
+                        🚀 Начать Скрапинг
+                    </button>
+                    <button id="clearBtn" class="btn btn-secondary">
+                        🗑️ Очистить Результаты
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Извлечение информации о товарах...</p>
+            </div>
+
+            <div id="messages"></div>
+
+            <div class="results-section">
+                <div id="resultsContainer" style="display: none;">
+                    <h2>📊 Результаты Скрапинга</h2>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>🖼️ Изображение</th>
+                                <th>📦 Детали Товара</th>
+                                <th>💰 Цены</th>
+                                <th>📊 Продажи и Рейтинг</th>
+                                <th>🏭 Бренд и Происхождение</th>
+                                <th>📋 Характеристики</th>
+                                <th>🎨 Варианты</th>
+                                <th>🌐 Платформа</th>
+                                <th>🔗 Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noResults" class="no-results" style="display: none;">
+                    <p>Пока нет результатов. Вставьте ссылки на товары и нажмите "Начать Скрапинг"!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ProductScraper {
+            constructor() {
+                this.initializeElements();
+                this.bindEvents();
+                this.showNoResults();
+            }
+
+            initializeElements() {
+                this.urlInput = document.getElementById('urlInput');
+                this.startBtn = document.getElementById('startBtn');
+                this.clearBtn = document.getElementById('clearBtn');
+                this.loading = document.getElementById('loading');
+                this.messages = document.getElementById('messages');
+                this.resultsContainer = document.getElementById('resultsContainer');
+                this.resultsTableBody = document.getElementById('resultsTableBody');
+                this.noResults = document.getElementById('noResults');
+            }
+
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startScraping());
+                this.clearBtn.addEventListener('click', () => this.clearResults());
+                this.urlInput.addEventListener('input', () => this.validateInput());
+            }
+
+            validateInput() {
+                const urls = this.getUrls();
+                const validUrls = urls.filter(url => this.isValidProductUrl(url).isValid);
+                const invalidUrls = urls.filter(url => !this.isValidProductUrl(url).isValid);
+                
+                console.log('Total URLs:', urls.length);
+                console.log('Valid URLs:', validUrls.length);
+                console.log('Invalid URLs:', invalidUrls.length);
+                
+                if (urls.length > 0 && validUrls.length === 0) {
+                    this.urlInput.classList.add('error');
+                    this.showMessage('Пожалуйста, введите корректные ссылки на товары с поддерживаемых платформ (1688, Pinduoduo, Amazon, AliExpress, Alibaba, Taobao)', 'error');
+                } else if (invalidUrls.length > 0) {
+                    this.urlInput.classList.add('error');
+                    this.showMessage(`Найдено ${invalidUrls.length} некорректных ссылок. Будут обработаны только корректные ссылки на товары.`, 'error');
+                } else {
+                    this.urlInput.classList.remove('error');
+                    this.clearMessages();
+                }
+            }
+
+            getUrls() {
+                const urls = this.urlInput.value
+                    .split('\n')
+                    .map(url => {
+                        // Clean the URL more thoroughly
+                        let cleanUrl = url.trim();
+                        // Remove any leading @ symbols or other special characters
+                        cleanUrl = cleanUrl.replace(/^[@\s\-_]+/, '');
+                        // Remove any trailing special characters
+                        cleanUrl = cleanUrl.replace(/[\s@\-_]+$/, '');
+                        
+                        // Additional cleaning for complex URLs
+                        // If URL doesn't start with http, try to add it
+                        if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+                            // Check if it looks like a domain
+                            if (cleanUrl.includes('.') && (cleanUrl.includes('taobao') || cleanUrl.includes('tmall') || 
+                                cleanUrl.includes('1688') || cleanUrl.includes('amazon') || 
+                                cleanUrl.includes('aliexpress') || cleanUrl.includes('alibaba') || 
+                                cleanUrl.includes('pinduoduo'))) {
+                                cleanUrl = 'https://' + cleanUrl;
+                            }
+                        }
+                        
+                        return cleanUrl;
+                    })
+                    .filter(url => url.length > 0);
+                console.log('Extracted URLs:', urls);
+                return urls;
+            }
+
+            isValidProductUrl(url) {
+                // URL patterns for all supported platforms
+                const platformPatterns = {
+                    '1688': [
+                        /^https?:\/\/(www\.)?1688\.com\/detail\/offer\/\d+\.html(\?.*)?$/,
+                        /^https?:\/\/detail\.1688\.com\/offer\/\d+\.html(\?.*)?$/,
+                        /^https?:\/\/(www\.)?1688\.com\/offer\/\d+\.html(\?.*)?$/
+                    ],
+                    'pinduoduo': [
+                        /^https?:\/\/(www\.)?pinduoduo\.com\/goods_detail\.html\?.*goods_id=\d+.*$/,
+                        /^https?:\/\/(www\.)?yangkeduo\.com\/goods\.html\?.*goods_id=\d+.*$/,
+                        /^https?:\/\/(www\.)?pinduoduo\.com\/goods_detail\.html.*$/,
+                        /^https?:\/\/(www\.)?yangkeduo\.com\/goods\.html.*$/
+                    ],
+                    'amazon': [
+                        /^https?:\/\/(www\.)?amazon\.(com|co\.uk|de|fr|it|es|ca|com\.au|co\.jp|in|com\.br|com\.mx)\/dp\/[A-Z0-9]{10}(\/.*)?$/,
+                        /^https?:\/\/(www\.)?amazon\.(com|co\.uk|de|fr|it|es|ca|com\.au|co\.jp|in|com\.br|com\.mx)\/product\/[A-Z0-9]{10}(\/.*)?$/
+                    ],
+                    'aliexpress': [
+                        /^https?:\/\/(www\.)?aliexpress\.(com|ru|us|fr|de|it|es|co\.uk|ca|com\.au|co\.jp|in|com\.br|com\.mx)\/item\/\d+\.html.*$/,
+                        /^https?:\/\/(www\.)?aliexpress\.(com|ru|us|fr|de|it|es|co\.uk|ca|com\.au|co\.jp|in|com\.br|com\.mx)\/i\/\d+\.html.*$/,
+                        /^https?:\/\/(www\.)?aliexpress\.(com|ru|us|fr|de|it|es|co\.uk|ca|com\.au|co\.jp|in|com\.br|com\.mx)\/item\/\d+.*$/
+                    ],
+                    'alibaba': [
+                        /^https?:\/\/(www\.)?alibaba\.com\/product-detail\/[^\/]+\/\d+\.html(\?.*)?$/,
+                        /^https?:\/\/(www\.)?alibaba\.com\/detail\/[^\/]+\/\d+\.html(\?.*)?$/
+                    ],
+                    'taobao': [
+                        /^https?:\/\/item\.taobao\.com\/item\.htm\?.*id=\d+.*$/,
+                        /^https?:\/\/detail\.tmall\.com\/item\.htm\?.*id=\d+.*$/,
+                        /^https?:\/\/item\.taobao\.com\/item\.htm\?.*$/,
+                        /^https?:\/\/detail\.tmall\.com\/item\.htm\?.*$/
+                    ]
+                };
+                
+                // Check if URL matches any platform pattern
+                for (const [platform, patterns] of Object.entries(platformPatterns)) {
+                    if (patterns.some(pattern => pattern.test(url))) {
+                        console.log(`Valid ${platform} URL:`, url);
+                        return { isValid: true, platform: platform };
+                    }
+                }
+                
+                // Fallback: Check for platform keywords in URL
+                const platformKeywords = {
+                    'taobao': ['taobao.com', 'tmall.com'],
+                    '1688': ['1688.com'],
+                    'amazon': ['amazon.com', 'amazon.co.uk', 'amazon.de', 'amazon.fr'],
+                    'aliexpress': ['aliexpress.com', 'aliexpress.ru'],
+                    'alibaba': ['alibaba.com'],
+                    'pinduoduo': ['pinduoduo.com', 'yangkeduo.com']
+                };
+                
+                for (const [platform, keywords] of Object.entries(platformKeywords)) {
+                    if (keywords.some(keyword => url.includes(keyword))) {
+                        console.log(`Fallback match for ${platform} URL:`, url);
+                        return { isValid: true, platform: platform };
+                    }
+                }
+                
+                console.log('Invalid URL:', url);
+                return { isValid: false, platform: null };
+            }
+
+            async startScraping() {
+                const urls = this.getUrls();
+                
+                if (urls.length === 0) {
+                    this.showMessage('Пожалуйста, введите хотя бы одну ссылку на товар с поддерживаемых платформ', 'error');
+                    return;
+                }
+
+                const validUrls = urls.filter(url => this.isValidProductUrl(url).isValid);
+                const invalidUrls = urls.filter(url => !this.isValidProductUrl(url).isValid);
+
+                if (invalidUrls.length > 0) {
+                    this.showMessage(`Найдено ${invalidUrls.length} некорректных ссылок. Будут обработаны только корректные ссылки на товары.`, 'error');
+                }
+
+                if (validUrls.length === 0) {
+                    this.showMessage('Не найдено корректных ссылок на товары с поддерживаемых платформ', 'error');
+                    return;
+                }
+
+                this.showLoading(true);
+                this.clearMessages();
+                this.clearResults();
+
+                try {
+                    const results = await this.scrapeProducts(validUrls);
+                    this.displayResults(results);
+                    this.showMessage(`Успешно извлечена информация о ${results.length} товарах с различных платформ!`, 'success');
+                } catch (error) {
+                    this.showMessage('Произошла ошибка при извлечении данных. Пожалуйста, попробуйте снова.', 'error');
+                    console.error('Scraping error:', error);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async scrapeProducts(urls) {
+                const results = [];
+                
+                for (const url of urls) {
+                    try {
+                        const productData = await this.scrapeSingleProduct(url);
+                        results.push(productData);
+                    } catch (error) {
+                        results.push({
+                            url: url,
+                            title: 'Error',
+                            description: 'Failed to scrape product data',
+                            price: 'N/A',
+                            rating: 'N/A',
+                            sellerStatus: 'Error',
+                            image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik00MCAyMEMyOSA0IDIwIDEzIDIwIDI0VjU2QzIwIDY3IDI5IDc2IDQwIDc2QzUxIDc2IDYwIDY3IDYwIDU2VjI0QzYwIDEzIDUxIDQgNDAgNFoiIGZpbGw9IiNGRjZCNkIiLz4KPHBhdGggZD0iTTQwIDM2VjQ4TTQwIDUyVjU2IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K',
+                            error: true
+                        });
+                    }
+                }
+                
+                return results;
+            }
+
+            async scrapeSingleProduct(url) {
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+                
+                // Get platform information
+                const urlInfo = this.isValidProductUrl(url);
+                const platform = urlInfo.platform;
+
+                // Platform-specific mock data
+                // In a real implementation, you would parse the actual HTML/JSON from each platform
+                const platformMockData = {
+                    '1688': [
+                    {
+                        title: 'Xuefeier 5-Ply Combed Baby Milk Cotton Yarn for DIY Knitting',
+                        titleRu: 'Пряжа Xuefeier 5-слойная расчесанная детская молочная хлопковая для вязания',
+                        description: 'Premium 5-ply combed baby milk cotton yarn for DIY knitting and crochet projects. High quality material perfect for handmade crafts.',
+                        descriptionRu: 'Премиальная 5-слойная расчесанная детская молочная хлопковая пряжа для вязания и вязания крючком. Высококачественный материал идеально подходит для рукоделия.',
+                        price: '¥8.90 ~ ¥9.90',
+                        originalPrice: '¥12.90',
+                        minOrder: '1 roll minimum',
+                        minOrderRu: 'Минимум 1 моток',
+                        rating: 5.0,
+                        reviews: 100,
+                        salesVolume: '31,000+ rolls sold',
+                        salesVolumeRu: 'Продано 31,000+ мотков',
+                        sellerStatus: 'verified',
+                        brand: 'Xuefeier',
+                        origin: 'Nanjing, Jiangsu',
+                        originRu: 'Нанкин, Цзянсу',
+                        composition: '60% long-staple cotton, 40% acrylic',
+                        compositionRu: '60% длинноволокнистый хлопок, 40% акрил',
+                        specifications: {
+                            yarnCount: '20s',
+                            ply: '5',
+                            weight: '100g',
+                            form: 'Skein'
+                        },
+                        specificationsRu: {
+                            yarnCount: '20s',
+                            ply: '5',
+                            weight: '100g',
+                            form: 'Моток'
+                        },
+                        variations: ['Pure White', 'Milk White', 'Beige', 'Light Yellow', 'Golden Yellow', 'Ginger Yellow', 'Orange Yellow', 'Orange Red', 'Light Pink', 'Pink', 'Flesh Pink', 'Rouge Red'],
+                        variationsRu: ['Чисто белый', 'Молочный белый', 'Бежевый', 'Светло-желтый', 'Золотисто-желтый', 'Имбирно-желтый', 'Оранжево-желтый', 'Оранжево-красный', 'Светло-розовый', 'Розовый', 'Телесный розовый', 'Румяный красный'],
+                        stock: 4566,
+                        shipping: 'Free shipping over ¥50',
+                        shippingRu: 'Бесплатная доставка от ¥50',
+                        guarantee: 'Late delivery compensation',
+                        guaranteeRu: 'Компенсация за задержку доставки',
+                        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=80&h=80&fit=crop&crop=center'
+                    },
+                    {
+                        title: 'High Quality Wireless Bluetooth Headphones with Noise Cancellation',
+                        titleRu: 'Высококачественные беспроводные Bluetooth наушники с шумоподавлением',
+                        description: 'Premium noise-cancelling wireless headphones with 30-hour battery life, perfect for sports and daily use.',
+                        descriptionRu: 'Премиальные беспроводные наушники с шумоподавлением и 30-часовой батареей, идеально подходят для спорта и повседневного использования.',
+                        price: '¥89.99 ~ ¥129.99',
+                        originalPrice: '¥199.99',
+                        minOrder: '1 piece minimum',
+                        minOrderRu: 'Минимум 1 штука',
+                        rating: 4.8,
+                        reviews: 1280,
+                        salesVolume: '15,000+ pieces sold',
+                        salesVolumeRu: 'Продано 15,000+ штук',
+                        sellerStatus: 'verified',
+                        brand: 'SoundMax',
+                        origin: 'Shenzhen, Guangdong',
+                        originRu: 'Шэньчжэнь, Гуандун',
+                        composition: 'ABS plastic + metal',
+                        compositionRu: 'АБС пластик + металл',
+                        specifications: {
+                            battery: '30 hours',
+                            range: '10 meters',
+                            weight: '180g',
+                            type: 'In-ear'
+                        },
+                        specificationsRu: {
+                            battery: '30 часов',
+                            range: '10 метров',
+                            weight: '180г',
+                            type: 'Внутриканальные'
+                        },
+                        variations: ['Black', 'White', 'Blue', 'Red'],
+                        variationsRu: ['Черный', 'Белый', 'Синий', 'Красный'],
+                        stock: 2500,
+                        shipping: 'Free shipping over ¥100',
+                        shippingRu: 'Бесплатная доставка от ¥100',
+                        guarantee: '7-day return policy',
+                        guaranteeRu: '7-дневный возврат',
+                        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80&h=80&fit=crop&crop=center'
+                    },
+                    {
+                        title: 'Smart Fitness Tracker with Heart Rate Monitor and GPS',
+                        titleRu: 'Умный фитнес-трекер с монитором сердечного ритма и GPS',
+                        description: 'Advanced fitness tracker with heart rate monitor, GPS tracking, and 7-day battery life.',
+                        descriptionRu: 'Продвинутый фитнес-трекер с монитором сердечного ритма, GPS-отслеживанием и 7-дневной батареей.',
+                        price: '¥159.99 ~ ¥199.99',
+                        originalPrice: '¥299.99',
+                        minOrder: '1 piece minimum',
+                        minOrderRu: 'Минимум 1 штука',
+                        rating: 4.6,
+                        reviews: 890,
+                        salesVolume: '8,500+ pieces sold',
+                        salesVolumeRu: 'Продано 8,500+ штук',
+                        sellerStatus: 'verified',
+                        brand: 'FitTech',
+                        origin: 'Hangzhou, Zhejiang',
+                        originRu: 'Ханчжоу, Чжэцзян',
+                        composition: 'Silicone + stainless steel',
+                        compositionRu: 'Силикон + нержавеющая сталь',
+                        specifications: {
+                            battery: '7 days',
+                            waterproof: '50 meters',
+                            weight: '45g',
+                            screen: '1.4 inches'
+                        },
+                        specificationsRu: {
+                            battery: '7 дней',
+                            waterproof: '50 метров',
+                            weight: '45г',
+                            screen: '1.4 дюйма'
+                        },
+                        variations: ['Black', 'White', 'Pink', 'Blue'],
+                        variationsRu: ['Черный', 'Белый', 'Розовый', 'Синий'],
+                        stock: 1800,
+                        shipping: 'Free shipping over ¥200',
+                        shippingRu: 'Бесплатная доставка от ¥200',
+                        guarantee: '1-year warranty',
+                        guaranteeRu: '1 год гарантии',
+                        image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=80&h=80&fit=crop&crop=center'
+                    },
+                    {
+                        title: 'High Capacity Power Bank 20000mAh with Fast Charging',
+                        titleRu: 'Высокоемкий Power Bank 20000mAh с быстрой зарядкой',
+                        description: 'High capacity portable charger with fast charging technology, LED display, and multiple output ports.',
+                        descriptionRu: 'Высокоемкий портативный зарядник с технологией быстрой зарядки, LED-дисплеем и несколькими выходными портами.',
+                        price: '¥45.99 ~ ¥65.99',
+                        originalPrice: '¥89.99',
+                        minOrder: '1 piece minimum',
+                        minOrderRu: 'Минимум 1 штука',
+                        rating: 4.7,
+                        reviews: 2560,
+                        salesVolume: '25,000+ pieces sold',
+                        salesVolumeRu: 'Продано 25,000+ штук',
+                        sellerStatus: 'verified',
+                        brand: 'PowerMax',
+                        origin: 'Suzhou, Jiangsu',
+                        originRu: 'Сучжоу, Цзянсу',
+                        composition: 'Lithium polymer battery',
+                        compositionRu: 'Литий-полимерная батарея',
+                        specifications: {
+                            capacity: '20000mAh',
+                            output: '18W fast charge',
+                            weight: '380g',
+                            ports: '3 USB ports'
+                        },
+                        specificationsRu: {
+                            capacity: '20000mAh',
+                            output: '18W быстрая зарядка',
+                            weight: '380г',
+                            ports: '3 USB порта'
+                        },
+                        variations: ['Black', 'White', 'Silver'],
+                        variationsRu: ['Черный', 'Белый', 'Серебряный'],
+                        stock: 3200,
+                        shipping: 'Free shipping over ¥50',
+                        shippingRu: 'Бесплатная доставка от ¥50',
+                        guarantee: '6-month warranty',
+                        guaranteeRu: '6 месяцев гарантии',
+                        image: 'https://images.unsplash.com/photo-1609592807905-4c29c8b1a7e8?w=80&h=80&fit=crop&crop=center'
+                    },
+                    {
+                        title: 'Ergonomic Office Chair with Adjustable Height',
+                        titleRu: 'Эргономичное офисное кресло с регулируемой высотой',
+                        description: 'Comfortable ergonomic office chair with lumbar support, adjustable height, and 360-degree swivel.',
+                        descriptionRu: 'Удобное эргономичное офисное кресло с поддержкой поясницы, регулируемой высотой и поворотом на 360 градусов.',
+                        price: '¥299.99 ~ ¥399.99',
+                        originalPrice: '¥599.99',
+                        minOrder: '1 piece minimum',
+                        minOrderRu: 'Минимум 1 штука',
+                        rating: 4.4,
+                        reviews: 670,
+                        salesVolume: '3,200+ pieces sold',
+                        salesVolumeRu: 'Продано 3,200+ штук',
+                        sellerStatus: 'unverified',
+                        brand: 'ComfortPro',
+                        origin: 'Qingdao, Shandong',
+                        originRu: 'Циндао, Шаньдун',
+                        composition: 'Mesh fabric + metal frame',
+                        compositionRu: 'Сетчатая ткань + металлический каркас',
+                        specifications: {
+                            weight: '15kg',
+                            height: 'Adjustable',
+                            material: 'Breathable mesh',
+                            wheels: '5 universal wheels'
+                        },
+                        specificationsRu: {
+                            weight: '15кг',
+                            height: 'Регулируемая',
+                            material: 'Дышащая сетка',
+                            wheels: '5 универсальных колес'
+                        },
+                        variations: ['Black', 'Gray', 'Blue'],
+                        variationsRu: ['Черный', 'Серый', 'Синий'],
+                        stock: 450,
+                        shipping: 'Free shipping over ¥500',
+                        shippingRu: 'Бесплатная доставка от ¥500',
+                        guarantee: '3-year warranty',
+                        guaranteeRu: '3 года гарантии',
+                        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=80&h=80&fit=crop&crop=center'
+                    }
+                    ],
+                    'pinduoduo': [
+                        {
+                            title: 'Smart Wireless Earbuds with Active Noise Cancellation',
+                            titleRu: 'Умные беспроводные наушники с активным шумоподавлением',
+                            description: 'High-quality wireless earbuds with advanced noise cancellation technology.',
+                            descriptionRu: 'Высококачественные беспроводные наушники с передовой технологией шумоподавления.',
+                            price: '¥199.00 ~ ¥299.00',
+                            originalPrice: '¥399.00',
+                            minOrder: '1 piece minimum',
+                            minOrderRu: 'Минимум 1 штука',
+                            rating: 4.6,
+                            reviews: 2500,
+                            salesVolume: '50,000+ pieces sold',
+                            salesVolumeRu: 'Продано 50,000+ штук',
+                            sellerStatus: 'verified',
+                            brand: 'SoundPro',
+                            origin: 'Shenzhen, Guangdong',
+                            originRu: 'Шэньчжэнь, Гуандун',
+                            composition: 'Plastic + metal',
+                            compositionRu: 'Пластик + металл',
+                            specifications: {
+                                battery: '6 hours',
+                                range: '15 meters',
+                                weight: '120g',
+                                type: 'True wireless'
+                            },
+                            specificationsRu: {
+                                battery: '6 часов',
+                                range: '15 метров',
+                                weight: '120г',
+                                type: 'Полностью беспроводные'
+                            },
+                            variations: ['Black', 'White', 'Blue'],
+                            variationsRu: ['Черный', 'Белый', 'Синий'],
+                            stock: 5000,
+                            shipping: 'Free shipping over ¥99',
+                            shippingRu: 'Бесплатная доставка от ¥99',
+                            guarantee: '1-year warranty',
+                            guaranteeRu: '1 год гарантии',
+                            image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80&h=80&fit=crop&crop=center'
+                        }
+                    ],
+                    'taobao': [
+                        {
+                            title: 'Wrigley\'s Doublemint Sugar-free Mint Candy Spearmint Flavor',
+                            titleRu: 'Жвачка Wrigley\'s Doublemint без сахара мятная со вкусом мяты',
+                            description: 'Fresh breath mint candy with spearmint flavor, perfect for after meals, dates, and social occasions. Sugar-free formula.',
+                            descriptionRu: 'Мятные конфеты для свежего дыхания со вкусом мяты, идеально подходят после еды, на свиданиях и в социальных ситуациях. Без сахара.',
+                            price: '¥10.90',
+                            originalPrice: '¥15.90',
+                            minOrder: '1 pack minimum',
+                            minOrderRu: 'Минимум 1 упаковка',
+                            rating: 4.6,
+                            reviews: 8500,
+                            salesVolume: '500,000+ packs sold',
+                            salesVolumeRu: 'Продано 500,000+ упаковок',
+                            sellerStatus: 'verified',
+                            brand: 'Wrigley\'s',
+                            origin: 'Nantong, Jiangsu',
+                            originRu: 'Наньтун, Цзянсу',
+                            composition: 'Sugar-free, Spearmint flavor',
+                            compositionRu: 'Без сахара, вкус мяты',
+                            specifications: {
+                                flavor: 'Spearmint',
+                                sugar: 'Sugar-free',
+                                weight: '50g per pack',
+                                pieces: '20 pieces'
+                            },
+                            specificationsRu: {
+                                flavor: 'Мята',
+                                sugar: 'Без сахара',
+                                weight: '50г в упаковке',
+                                pieces: '20 штук'
+                            },
+                            variations: ['Spearmint', 'Peppermint', 'Wintergreen'],
+                            variationsRu: ['Мята', 'Перечная мята', 'Зимняя мята'],
+                            stock: 15000,
+                            shipping: 'Free shipping over ¥88',
+                            shippingRu: 'Бесплатная доставка от ¥88',
+                            guarantee: '7-day return policy',
+                            guaranteeRu: '7-дневный возврат',
+                            image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=80&h=80&fit=crop&crop=center'
+                        }
+                    ],
+                    'amazon': [
+                        {
+                            title: 'Echo Dot (4th Gen) Smart Speaker with Alexa',
+                            titleRu: 'Echo Dot (4-е поколение) Умная колонка с Alexa',
+                            description: 'Meet Echo Dot - Our most popular smart speaker with a fabric design. It is our most compact smart speaker that fits perfectly into small space.',
+                            descriptionRu: 'Познакомьтесь с Echo Dot - наша самая популярная умная колонка с тканевым дизайном. Это наша самая компактная умная колонка, которая идеально вписывается в небольшое пространство.',
+                            price: '$49.99',
+                            originalPrice: '$59.99',
+                            minOrder: '1 piece minimum',
+                            minOrderRu: 'Минимум 1 штука',
+                            rating: 4.5,
+                            reviews: 15000,
+                            salesVolume: '1M+ units sold',
+                            salesVolumeRu: 'Продано 1M+ единиц',
+                            sellerStatus: 'verified',
+                            brand: 'Amazon',
+                            origin: 'United States',
+                            originRu: 'Соединенные Штаты',
+                            composition: 'Fabric + plastic',
+                            compositionRu: 'Ткань + пластик',
+                            specifications: {
+                                power: '15W',
+                                connectivity: 'Wi-Fi, Bluetooth',
+                                weight: '304g',
+                                dimensions: '100 x 100 x 89 mm'
+                            },
+                            specificationsRu: {
+                                power: '15W',
+                                connectivity: 'Wi-Fi, Bluetooth',
+                                weight: '304г',
+                                dimensions: '100 x 100 x 89 мм'
+                            },
+                            variations: ['Charcoal', 'Glacier White', 'Twilight Blue'],
+                            variationsRu: ['Угольный', 'Ледяной белый', 'Сумеречный синий'],
+                            stock: 10000,
+                            shipping: 'Free shipping with Prime',
+                            shippingRu: 'Бесплатная доставка с Prime',
+                            guarantee: '1-year warranty',
+                            guaranteeRu: '1 год гарантии',
+                            image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=80&h=80&fit=crop&crop=center'
+                        }
+                    ],
+                    'aliexpress': [
+                        {
+                            title: 'Portable Bluetooth Speaker with LED Lights',
+                            titleRu: 'Портативная Bluetooth колонка со светодиодной подсветкой',
+                            description: 'High-quality portable Bluetooth speaker with colorful LED lights, perfect for parties and outdoor activities.',
+                            descriptionRu: 'Высококачественная портативная Bluetooth колонка с красочной светодиодной подсветкой, идеально подходит для вечеринок и активного отдыха.',
+                            price: '$25.99 ~ $35.99',
+                            originalPrice: '$49.99',
+                            minOrder: '1 piece minimum',
+                            minOrderRu: 'Минимум 1 штука',
+                            rating: 4.3,
+                            reviews: 8500,
+                            salesVolume: '100,000+ pieces sold',
+                            salesVolumeRu: 'Продано 100,000+ штук',
+                            sellerStatus: 'verified',
+                            brand: 'SoundWave',
+                            origin: 'Guangzhou, Guangdong',
+                            originRu: 'Гуанчжоу, Гуандун',
+                            composition: 'Plastic + LED',
+                            compositionRu: 'Пластик + светодиоды',
+                            specifications: {
+                                power: '10W',
+                                battery: '8 hours',
+                                weight: '500g',
+                                waterproof: 'IPX5'
+                            },
+                            specificationsRu: {
+                                power: '10W',
+                                battery: '8 часов',
+                                weight: '500г',
+                                waterproof: 'IPX5'
+                            },
+                            variations: ['Black', 'White', 'Red', 'Blue'],
+                            variationsRu: ['Черный', 'Белый', 'Красный', 'Синий'],
+                            stock: 15000,
+                            shipping: 'Free shipping over $15',
+                            shippingRu: 'Бесплатная доставка от $15',
+                            guarantee: '6-month warranty',
+                            guaranteeRu: '6 месяцев гарантии',
+                            image: 'https://images.unsplash.com/photo-1609592807905-4c29c8b1a7e8?w=80&h=80&fit=crop&crop=center'
+                        }
+                    ],
+                    'alibaba': [
+                        {
+                            title: 'Wholesale LED Strip Lights RGB Color Changing',
+                            titleRu: 'Оптовые светодиодные ленты RGB с изменением цвета',
+                            description: 'High-quality LED strip lights with RGB color changing capability, perfect for home decoration and commercial use.',
+                            descriptionRu: 'Высококачественные светодиодные ленты с возможностью изменения цвета RGB, идеально подходят для домашнего декора и коммерческого использования.',
+                            price: '$0.50 ~ $2.00 per meter',
+                            originalPrice: '$1.00 ~ $3.00 per meter',
+                            minOrder: '100 meters minimum',
+                            minOrderRu: 'Минимум 100 метров',
+                            rating: 4.7,
+                            reviews: 3200,
+                            salesVolume: '500,000+ meters sold',
+                            salesVolumeRu: 'Продано 500,000+ метров',
+                            sellerStatus: 'verified',
+                            brand: 'LEDMaster',
+                            origin: 'Shenzhen, Guangdong',
+                            originRu: 'Шэньчжэнь, Гуандун',
+                            composition: 'LED chips + copper wire',
+                            compositionRu: 'Светодиодные чипы + медная проволока',
+                            specifications: {
+                                voltage: '12V/24V',
+                                power: '14.4W/m',
+                                length: '5m per roll',
+                                colors: 'RGB + White'
+                            },
+                            specificationsRu: {
+                                voltage: '12V/24V',
+                                power: '14.4W/м',
+                                length: '5м в рулоне',
+                                colors: 'RGB + Белый'
+                            },
+                            variations: ['Warm White', 'Cool White', 'RGB', 'RGBW'],
+                            variationsRu: ['Теплый белый', 'Холодный белый', 'RGB', 'RGBW'],
+                            stock: 50000,
+                            shipping: 'Free shipping over $200',
+                            shippingRu: 'Бесплатная доставка от $200',
+                            guarantee: '2-year warranty',
+                            guaranteeRu: '2 года гарантии',
+                            image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=80&h=80&fit=crop&crop=center'
+                        }
+                    ]
+                };
+
+                // Get platform-specific mock data
+                const platformProducts = platformMockData[platform] || platformMockData['1688'];
+                const randomProduct = platformProducts[Math.floor(Math.random() * platformProducts.length)];
+                
+                return {
+                    url: url,
+                    platform: platform,
+                    title: randomProduct.title,
+                    titleRu: randomProduct.titleRu,
+                    description: randomProduct.description,
+                    descriptionRu: randomProduct.descriptionRu,
+                    price: randomProduct.price,
+                    originalPrice: randomProduct.originalPrice,
+                    minOrder: randomProduct.minOrder,
+                    minOrderRu: randomProduct.minOrderRu,
+                    rating: randomProduct.rating,
+                    reviews: randomProduct.reviews,
+                    salesVolume: randomProduct.salesVolume,
+                    salesVolumeRu: randomProduct.salesVolumeRu,
+                    sellerStatus: randomProduct.sellerStatus,
+                    brand: randomProduct.brand,
+                    origin: randomProduct.origin,
+                    originRu: randomProduct.originRu,
+                    composition: randomProduct.composition,
+                    compositionRu: randomProduct.compositionRu,
+                    specifications: randomProduct.specifications,
+                    specificationsRu: randomProduct.specificationsRu,
+                    variations: randomProduct.variations,
+                    variationsRu: randomProduct.variationsRu,
+                    stock: randomProduct.stock,
+                    shipping: randomProduct.shipping,
+                    shippingRu: randomProduct.shippingRu,
+                    guarantee: randomProduct.guarantee,
+                    guaranteeRu: randomProduct.guaranteeRu,
+                    image: randomProduct.image
+                };
+            }
+
+            displayResults(results) {
+                this.resultsTableBody.innerHTML = '';
+                
+                results.forEach(result => {
+                    const row = document.createElement('tr');
+                    
+                    const stars = '★'.repeat(Math.floor(result.rating)) + '☆'.repeat(5 - Math.floor(result.rating));
+                    const statusClass = result.sellerStatus === 'verified' ? 'verified' : 
+                                      result.sellerStatus === 'unverified' ? 'unverified' : 'pending';
+                    const statusIcon = result.sellerStatus === 'verified' ? '✅' : 
+                                     result.sellerStatus === 'unverified' ? '❌' : '⏳';
+                    
+                    // Format specifications
+                    const specsHtml = result.specifications ? 
+                        Object.entries(result.specifications)
+                            .map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`)
+                            .join('') : 'N/A';
+                    
+                    // Format specifications in Russian
+                    const specsHtmlRu = result.specificationsRu ? 
+                        Object.entries(result.specificationsRu)
+                            .map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`)
+                            .join('') : 'N/A';
+                    
+                    // Format variations
+                    const variationsHtml = result.variations ? 
+                        result.variations.slice(0, 6).join(', ') + 
+                        (result.variations.length > 6 ? ` +${result.variations.length - 6} more` : '') : 'N/A';
+                    
+                    // Format variations in Russian
+                    const variationsHtmlRu = result.variationsRu ? 
+                        result.variationsRu.slice(0, 6).join(', ') + 
+                        (result.variationsRu.length > 6 ? ` +${result.variationsRu.length - 6} еще` : '') : 'N/A';
+                    
+                    row.innerHTML = `
+                        <td>
+                            <img src="${result.image}" alt="Product" class="product-image" 
+                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik00MCAyMEMyOSA0IDIwIDEzIDIwIDI0VjU2QzIwIDY3IDI5IDc2IDQwIDc2QzUxIDc2IDYwIDY3IDYwIDU2VjI0QzYwIDEzIDUxIDQgNDAgNFoiIGZpbGw9IiNGRjZCNkIiLz4KPHBhdGggZD0iTTQwIDM2VjQ4TTQwIDUyVjU2IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K'">
+                        </td>
+                        <td>
+                            <div class="product-title">${result.title}</div>
+                            <div class="product-description">${result.description}</div>
+                            <div style="margin-top: 8px; font-size: 0.9rem; color: #666;">
+                                <div><strong>Min Order:</strong> ${result.minOrder || 'N/A'}</div>
+                                <div><strong>Stock:</strong> ${result.stock || 'N/A'}</div>
+                                <div><strong>Shipping:</strong> ${result.shipping || 'N/A'}</div>
+                                <div><strong>Guarantee:</strong> ${result.guarantee || 'N/A'}</div>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
+                                <div><strong>RU:</strong> ${result.titleRu || 'N/A'}</div>
+                                <div style="margin-top: 4px;">${result.descriptionRu || 'N/A'}</div>
+                                <div style="margin-top: 4px;"><strong>Min Order:</strong> ${result.minOrderRu || 'N/A'}</div>
+                                <div><strong>Shipping:</strong> ${result.shippingRu || 'N/A'}</div>
+                                <div><strong>Guarantee:</strong> ${result.guaranteeRu || 'N/A'}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="price">${result.price}</div>
+                            ${result.originalPrice ? `<div style="text-decoration: line-through; color: #999; font-size: 0.9rem;">${result.originalPrice}</div>` : ''}
+                        </td>
+                        <td>
+                            <div class="rating">
+                                <span class="stars">${stars}</span>
+                                <span class="rating-text">${result.rating} (${result.reviews} reviews)</span>
+                            </div>
+                            <div style="margin-top: 5px; font-size: 0.9rem; color: #27ae60;">
+                                <strong>Sales:</strong> ${result.salesVolume || 'N/A'}
+                            </div>
+                            <div style="margin-top: 5px;">
+                                <span class="status ${statusClass}">
+                                    ${statusIcon} ${result.sellerStatus.charAt(0).toUpperCase() + result.sellerStatus.slice(1)}
+                                </span>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
+                                <div><strong>RU Sales:</strong> ${result.salesVolumeRu || 'N/A'}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div><strong>Brand:</strong> ${result.brand || 'N/A'}</div>
+                            <div><strong>Origin:</strong> ${result.origin || 'N/A'}</div>
+                            <div><strong>Composition:</strong> ${result.composition || 'N/A'}</div>
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
+                                <div><strong>RU Origin:</strong> ${result.originRu || 'N/A'}</div>
+                                <div><strong>RU Composition:</strong> ${result.compositionRu || 'N/A'}</div>
+                            </div>
+                        </td>
+                        <td style="font-size: 0.85rem;">
+                            ${specsHtml}
+                            <div style="margin-top: 8px; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
+                                <div><strong>RU Specs:</strong></div>
+                                ${specsHtmlRu}
+                            </div>
+                        </td>
+                        <td style="font-size: 0.85rem;">
+                            ${variationsHtml}
+                            <div style="margin-top: 8px; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
+                                <div><strong>RU:</strong> ${variationsHtmlRu}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center;">
+                                <div style="font-weight: bold; color: #667eea; margin-bottom: 5px;">
+                                    ${this.getPlatformIcon(result.platform)} ${result.platform.toUpperCase()}
+                                </div>
+                                <div style="font-size: 0.8rem; color: #666;">
+                                    ${this.getPlatformDescription(result.platform)}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="${result.url}" target="_blank" style="color: #667eea; text-decoration: none; display: block; margin-bottom: 5px;">
+                                🔗 Посмотреть Товар
+                            </a>
+                            <button onclick="copyToClipboard('${result.url}')" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer;">
+                                📋 Копировать Ссылку
+                            </button>
+                        </td>
+                    `;
+                    
+                    this.resultsTableBody.appendChild(row);
+                });
+                
+                this.resultsContainer.style.display = 'block';
+                this.noResults.style.display = 'none';
+            }
+
+            clearResults() {
+                this.resultsTableBody.innerHTML = '';
+                this.resultsContainer.style.display = 'none';
+                this.showNoResults();
+            }
+
+            showNoResults() {
+                this.noResults.style.display = 'block';
+            }
+
+            showLoading(show) {
+                this.loading.style.display = show ? 'block' : 'none';
+                this.startBtn.disabled = show;
+            }
+
+            showMessage(message, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `${type}-message`;
+                messageDiv.textContent = message;
+                this.messages.appendChild(messageDiv);
+                
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 5000);
+            }
+
+            clearMessages() {
+                this.messages.innerHTML = '';
+            }
+
+            getPlatformIcon(platform) {
+                const icons = {
+                    '1688': '🏭',
+                    'pinduoduo': '🛒',
+                    'amazon': '📦',
+                    'aliexpress': '🚚',
+                    'alibaba': '🏢',
+                    'taobao': '🛍️'
+                };
+                return icons[platform] || '🌐';
+            }
+
+            getPlatformDescription(platform) {
+                const descriptions = {
+                    '1688': 'B2B Маркетплейс',
+                    'pinduoduo': 'Групповые Покупки',
+                    'amazon': 'Глобальная Электронная Коммерция',
+                    'aliexpress': 'Международная Торговля',
+                    'alibaba': 'B2B Платформа',
+                    'taobao': 'C2C Маркетплейс'
+                };
+                return descriptions[platform] || 'Электронная Коммерция';
+            }
+        }
+
+
+        // Copy to clipboard function
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show a temporary success message
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ Скопировано!';
+                button.style.background = '#d4edda';
+                button.style.color = '#155724';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#f8f9fa';
+                    button.style.color = '#333';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Не удалось скопировать в буфер обмена');
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new ProductScraper();
+        });
+    </script>
+</body>
+</html>
